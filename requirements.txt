@@ -1,0 +1,6 @@
+pytest
+networkx
+matplotlib
+coverage
+pydot
+graphviz

@@ -1,0 +1,162 @@
+# requirements.txt
+pytest>=7.0.0
+coverage>=7.0.0
+networkx>=3.0
+matplotlib>=3.5.0
+pydot>=1.4.0
+
+# .coveragerc
+[run]
+branch = True
+source = .
+
+[report]
+show_missing = True
+skip_covered = True
+precision = 2
+omit = 
+    tests/*
+    test_*
+    setup.py
+    cfg_analyzer.py
+    */__pycache__/*
+
+[html]
+directory = htmlcov
+
+---
+# .github/workflows/ci.yml
+name: White Box Testing
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  white-box-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y graphviz
+        
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Run tests with coverage
+      run: |
+        coverage run --branch -m pytest -v
+        coverage report -m
+        coverage xml
+        
+    - name: Generate CFG analysis
+      run: |
+        python cfg_analyzer.py
+        
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: |
+          coverage.xml
+          htmlcov/
+          cfg.png
+          
+    - name: Upload CFG diagram
+      uses: actions/upload-artifact@v4
+      with:
+        name: cfg-diagram
+        path: cfg.png
+
+---
+# README.md для проекту
+# White Box Testing Lab
+
+Лабораторна робота №6 з техніками тест-дизайну "білої скрині".
+
+## Структура проекту
+
+```
+white-box-testing-lab/
+├── auth.py              # Функція для тестування
+├── test_auth.py         # Повний набір тестів
+├── cfg_analyzer.py      # Аналізатор CFG
+├── requirements.txt     # Залежності
+├── .coveragerc         # Налаштування coverage
+├── .github/workflows/ci.yml  # CI/CD пайплайн
+└── README.md           # Документація
+```
+
+## Встановлення та запуск
+
+1. Клонування репозиторію:
+```bash
+git clone https://github.com/your-username/white-box-testing-lab.git
+cd white-box-testing-lab
+```
+
+2. Встановлення залежностей:
+```bash
+pip install -r requirements.txt
+```
+
+3. Запуск тестів з аналізом покриття:
+```bash
+coverage run --branch -m pytest -v
+coverage report -m
+coverage html
+```
+
+4. Генерація CFG та аналіз складності:
+```bash
+python cfg_analyzer.py
+```
+
+## Результати аналізу
+
+### Цикломатична складність
+- **Значення**: 6
+- **Мінімальна кількість тестів**: 6
+- **Кількість незалежних шляхів**: 5
+
+### Покриття коду
+- **Statement Coverage**: 100%
+- **Branch Coverage**: 100%
+- **Condition Coverage**: 100%
+- **MC/DC Coverage**: 100%
+- **Path Coverage**: 100% (всі 5 шляхів)
+
+### Шляхи виконання
+1. START → CHECK_CREDS → MISSING_CREDS
+2. START → CHECK_CREDS → CHECK_USER → USER_NOT_FOUND
+3. START → ... → CHECK_LOCKED → ACCOUNT_LOCKED
+4. START → ... → CHECK_PASSWORD → INCREMENT_ATTEMPTS → INVALID_PASSWORD
+5. START → ... → CHECK_PASSWORD → RESET_ATTEMPTS → AUTHENTICATED
+
+## Техніки тест-дизайну
+
+Проект демонструє наступні техніки білої скрині:
+- Statement Coverage (покриття інструкцій)
+- Branch Coverage (покриття гілок)
+- Condition Coverage (покриття умов)  
+- MC/DC (Modified Condition/Decision Coverage)
+- Path Coverage (покриття шляхів)
+- Control Flow Testing
+- Data Flow Testing (def-use pairs)
+
+## Автор
+[Nazar]
