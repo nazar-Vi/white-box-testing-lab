@@ -1,18 +1,35 @@
-# .coveragerc
 [run]
-branch = True
 source = .
+branch = True
+omit = 
+    test_*.py
+    *test*.py
+    setup.py
+    venv/*
+    env/*
+    .venv/*
 
 [report]
+# Показувати відсутні рядки
 show_missing = True
-skip_covered = True
+# Сортувати за покриттям
+sort = Cover
+# Точність до 2 знаків після коми
 precision = 2
-omit = 
-    tests/*
-    test_*
-    setup.py
-    cfg_analyzer.py
-    */__pycache__/*
+# Пропускати файли з 100% покриттям
+skip_covered = False
+
 
 [html]
+# Директорія для HTML звіту
 directory = htmlcov
+
+# Кольорова схема
+title = Звіт покриття коду - Лабораторна робота №6
+
+[xml]
+output = coverage.xml
+
+[json]
+output = coverage.json
+show_contexts = True
